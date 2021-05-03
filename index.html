@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Tempo Trascorso</title>
+  <style type="text/css">
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      padding: 10px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 1em;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px;
+    }
+
+    .text-big {
+      font-weight: 600;
+      font-size: 20px;
+    }
+
+    #output {
+      font-size: 34px;
+    }
+
+    #errorExplanation, .error {
+      color: #FF0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calcolo tempo trascorso</h1>
+    <label>
+      Inizio
+      <input type="datetime-local" name="fromTime" id="fromTime">
+    </label>
+    <label>
+      Fine
+      <input type="datetime-local" name="toTime" id="toTime">
+      <span id="errorExplanation"></span>
+    </label>
+
+    <div>
+      <label class="text-big">
+        Tempo trascorso (ore:minuti)
+        <input readonly type="text" id="output">
+      </label>
+    </div>
+  </div>
+  <script type="text/javascript">
+    const fromTimeInput = document.querySelector('input#fromTime')
+    const toTimeInput = document.querySelector('input#toTime')
+    const output = document.querySelector('#output')
+    const errorExplanation = document.querySelector('#errorExplanation')
+
+    let fromTime = null
+    let toTime = null
+
+    const calculateAndDisplay = (fromTime, toTime) => {
+      if (!validate(fromTime, toTime)) { return }
+
+      const millis = toTime.valueOf() - fromTime.valueOf()
+      const hours = Math.floor(millis / 1000 / 60 / 60)
+      const minutes = Math.floor((millis - (hours * 60 * 60 * 1000)) / 1000 / 60)
+
+      output.value = hours + ':' + minutes.toString().padStart(2, '0') 
+    }
+
+    const validate = (fromTime, toTime) => {
+      if (fromTime > toTime) {
+        toTimeInput.classList.add('error')
+        errorExplanation.innerText = '"Fine" non può essere prima di "Inizio"'
+        output.value = ''
+        return false
+      } else {
+        toTimeInput.classList.remove('error')
+        errorExplanation.innerText = ''
+        return true
+      }
+    }
+
+    fromTimeInput.addEventListener('change', (event) => {
+      fromTime = new Date(event.target.value)
+
+      if (fromTime && toTime) {
+        calculateAndDisplay(fromTime, toTime)
+      }
+    })
+
+    toTimeInput.addEventListener('change', (event) => {
+      toTime = new Date(event.target.value)
+
+      if (fromTime && toTime) {
+        calculateAndDisplay(fromTime, toTime)
+      }
+    })
+
+    output.addEventListener('click', (event) => {
+      event.target.select()
+      document.execCommand('copy')
+    })
+  </script>
+</body>
+</html>
